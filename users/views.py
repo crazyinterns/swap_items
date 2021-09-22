@@ -30,4 +30,4 @@ def register(request):
             login(request, authenticated_user)
             return HttpResponseRedirect(reverse('login'))
     context = {'form': form}
-    return render(request, 'register.html', context)
+    return render(request, 'registration/register.html', context)
