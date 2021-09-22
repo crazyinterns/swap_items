@@ -28,7 +28,12 @@ class Item(models.Model):
         verbose_name='владелец',
         related_name='items'
     )
-    items_to_swap = models.ManyToManyField('self')
+    items_to_swap = models.ManyToManyField(
+        'self',
+        verbose_name='вещи, которые хотят поменять',
+        related_name='wanted_items',
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
