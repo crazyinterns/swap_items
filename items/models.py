@@ -36,4 +36,12 @@ class Item(models.Model):
     class Meta:
         verbose_name = 'предмет на обмен'
         verbose_name_plural = 'предметы на обмен'
-        ordering = ['-created_at']
+        ordering = ['-created_at', 'title']
+
+
+class Image(models.Model):
+    img = models.ImageField(upload_to='images')
+    item = models.ForeignKey(
+        'Item',
+        on_delete=models.CASCADE,
+        related_name='images')
