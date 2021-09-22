@@ -1,9 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class CustomUser(AbstractUser):
     """кастомный пользователь системы """
+    address = models.CharField(
+        'адрес',
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    phonenumber = PhoneNumberField(
+        verbose_name="Мобильный номер"
+    )
+    other_contact = models.CharField(
+        'Прочий контакт',
+        max_length=100,
+        blank=True,
+    )
     objects = UserManager()
 
     @property
