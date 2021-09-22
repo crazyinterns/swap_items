@@ -23,11 +23,12 @@ class Item(models.Model):
         related_name='items'
     )
     owner = models.ForeignKey(
-        'CustomUser',
+        CustomUser,
         on_delete=models.CASCADE,
         verbose_name='владелец',
         related_name='items'
     )
+    items_to_swap = models.ManyToManyField('self')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -44,4 +45,5 @@ class Image(models.Model):
     item = models.ForeignKey(
         'Item',
         on_delete=models.CASCADE,
-        related_name='images')
+        related_name='images'
+    )
