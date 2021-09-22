@@ -47,3 +47,10 @@ class Image(models.Model):
         on_delete=models.CASCADE,
         related_name='images'
     )
+
+    def __str__(self):
+        return f'{self.id}. Изображение для {self.item.title}'
+
+    class Meta:
+        verbose_name = 'изображение'
+        verbose_name_plural = 'изображения'
