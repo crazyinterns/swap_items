@@ -3,12 +3,50 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-  Привет, {{ user.username }}!
-  <p><a href="{% url 'logout' %}">Выйти</a></p>
-{% else %}
-  <p>Вы не вошли на сайт</p>
-  <a href="{% url 'login' %}">Войти</a> |
-  <a href="{% url 'register' %}">Регистрация</a>
-{% endif %}
+<div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+              <span>КАТЕГОРИИ</span>
+            </h6>
+            <ul class="nav flex-column mb-2">
+              {% for category in categories %}
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  {{ category.title }}
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+            <h1 class="h2">Вещи на обмен</h1>
+          </div>
+
+          {% if items %}
+            {% for item in items %}
+
+              <div class="card" style="width: 100%">
+                <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.title }}</h5>
+                  <p class="card-text">{{ item.description|truncatewords:30 }}</p>
+                  <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>
+                </div>
+              </div>
+
+            {% endfor items %}
+          {% else %}
+            <h2>Вещей на обмен пока что нет.</h2>
+          {% endif %}
+
+        </main>
+      </div>
+    </div>
 {% endblock %}
