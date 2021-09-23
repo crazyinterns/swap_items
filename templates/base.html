@@ -10,7 +10,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">LOGO</a>
+  <a class="navbar-brand" href="{% url 'index' %}">LOGO</a>
 
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
@@ -25,11 +25,12 @@
     <span class="navbar-text">
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
+                    
                     <li class="nav-item">
-                        <a class="nav-link">Добро пожаловать, {{ user.username }}.</a>
+                      <a class="btn btn-primary" href="{% url 'new_item' %}">Подать объявление</a>
                     </li>
                     <li class="nav-item">
-                        <a  class="nav-link" href="#">Профиль</a>
+                        <a  class="nav-link" href="{% url 'profile' pk=request.user.id %}">{{ user.username }}</a>
                     </li>
                     <li class="nav-item">
                         <a  class="nav-link" href="{% url 'logout' %}">Выйти</a>

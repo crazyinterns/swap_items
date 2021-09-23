@@ -4,10 +4,14 @@ from django.urls import reverse_lazy
 from users.forms import CustomUserCreationForm
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth import logout, authenticate, login
 from users.forms import CustomUserCreationForm
 from django.shortcuts import reverse
+from django.shortcuts import render, get_object_or_404
+from users.models import CustomUser
+from users.forms import CustomUserChangeForm
+from django.contrib.auth.decorators import login_required
 
 
 def logout_view(request):
@@ -31,3 +35,25 @@ def register(request):
             return HttpResponseRedirect(reverse('login'))
     context = {'form': form}
     return render(request, 'registration/register.html', context)
+
+
+@login_required
+def profile(request, pk):
+    user = get_object_or_404(CustomUser, id=pk)
+    items = user.items.all
+
+    if user != request.user:
+        raise Http404
+
+    if request.method != 'POST':
+        form = CustomUserChangeForm(instance=user)
+    else:
+        form = CustomUserChangeForm(instance=user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('profile', args=[user.id]))
+    return render(
+        request,
+        'users/profile.html',
+        {'user_form': form, 'items': items}
+    )

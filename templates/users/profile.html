@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user_details.username }}{% endblock %}
+
+{% block content %}
+
+<div>
+    <form method="post" >
+      {% csrf_token %}
+      {{ user_form.as_p }}
+      <button class="btn btn-primary" type="submit">Сохранить</button>
+    </form>
+  {% if items %}
+    <p>Мои объявления</p>
+    {% for item in items %}
+      <div class="card" style="width: 40%">
+      {% if item.images.all.0 %}
+        <a href="{% url 'item_detail' item.id %}"><img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}"></a>
+      {% endif %}
+        <a href="{% url 'item_detail' item.id %}"><p class="card-text">{{ item.title }}</p></a>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endblock %}
+</div>
