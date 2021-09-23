@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h2>Подать объявление:</h2>
+{% endblock header %}
+
+{% block content %}
+
+<form action="{% url 'new_item' %}" method='POST' enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    {{ item_form.as_p }}
+    {{ image_form.as_p }}
+    <button name="submit" class="btn btn-primary">Разместить</button>
+</form>
+{% endblock %}
