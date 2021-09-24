@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from items.models import Item, Category, Image
 from django.contrib.auth.decorators import login_required
@@ -38,7 +38,46 @@ def index(request):
 
 def item_detail(request, pk):
     item = get_object_or_404(Item, id=pk)
-    return render(request, 'items/detail.html', {'item': item})
+    user = request.user
+
+    context = {'user': user, 'item': item}
+
+    return render(request, 'items/detail.html', context)
+
+
+@login_required
+def offers(request):
+    items = request.user.items.filter(items_to_swap__isnull=False)
+    items_to_swap = set()
+
+    for item in items:
+        items_to_swap.update(item.items_to_swap.all())
+
+    paginator = Paginator(items, settings.ITEMS_PER_PAGE)
+
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+    is_paginated = page.has_other_pages()
+
+    context = {
+        'page_obj': page,
+        'is_paginated': is_paginated,
+        'items_to_swap': items_to_swap
+    }
+
+    return render(request, 'items/offers.html', context)
+
+
+@login_required
+def send_offer(request, pk):
+    if request.method == 'POST':
+        wanted_item = get_object_or_404(Item, id=pk)
+        item_to_offer_id = request.POST.get('items_to_offer')
+        if item_to_offer_id:
+            item_to_offer = get_object_or_404(Item, id=item_to_offer_id[0])
+            wanted_item.items_to_swap.set([item_to_offer])
+            return HttpResponseRedirect(reverse('item_detail', args=[pk]))
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required

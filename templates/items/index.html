@@ -40,9 +40,9 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             {% if category %}
-              <h2 class="h2">Вещи на обмен из категории: <i>{{ category }}</i></h2>
+              <h2 class="h2">Хотят обменять из категории: <i>{{ category }}</i></h2>
             {% else %}
-              <h2 class="h2">Все вещи на обмен</h2>
+              <h2 class="h2">Хотят обменять</h2>
             {% endif %}
 
           </div>
@@ -50,12 +50,20 @@
           {% if page_obj %}
             {% for item in page_obj %}
 
-              <div class="card" style="width: 100%">
+              <div class="card" style="width: 60%">
                 <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
                 <div class="card-body">
                   <h5 class="card-title">{{ item.title }}</h5>
                   <p class="card-text">{{ item.description|truncatewords:30 }}</p>
                   <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>
+                  <p class="card-text"><small class="text-muted">
+                    Добавлено: {{item.created_at}} пользователем: {{item.owner.username}}
+                  </small></p>
+                  <p class="card-text"><small class="text-muted">
+                    Категория: <a href="{% url 'index' %}?category={{ item.category.title }}">
+                      {{ item.category.title }}
+                    </a>
+                  </small></p>
                 </div>
               </div>
 
