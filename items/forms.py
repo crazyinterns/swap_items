@@ -31,19 +31,25 @@ class ItemForm(forms.Form):
     phonenumber = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
-        label='Телефон'
+        label='Телефон',
+        required=False
     )
     email = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
-        label='Почта'
+        label='Почта',
+        required=False
     )
     other_contact = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
-        label='Прочий контакт'
+        label='Прочий контакт',
+        required=False
     )
     images = forms.ImageField(
         required=False,
         widget=forms.ClearableFileInput(attrs={'multiple': True})
     )
+
+
+

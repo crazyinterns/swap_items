@@ -9,13 +9,82 @@
 
   <div class="card-body">
     <h1 class="card-title">{{ item.title }}</h1>
-    <p class="card-text"><small class="text-muted">Добавлено: {{item.created_at}} пользователем: {{item.owner.username}}</small></p>
+    <p class="card-text"><small class="text-muted">
+      Добавлено: {{item.created_at}} пользователем: {{item.owner.username}}
+    </small></p>
+    <p class="card-text">
+      <small class="text-muted">
+        Категория: <a href="{% url 'index' %}?category={{ item.category.title }}">{{ item.category.title }}</a>
+      </small>
+    </p>
     <p class="card-text">{{ item.description }}</p>
 
+
+
+  </div>
+  <div>
+
+    {% if user.is_authenticated and item not in user.items.all %}
+
+      {% if user.items.all %}
+      <div class="alert alert-primary">
+        <button id="button_select" class="btn btn-primary" type="button" onclick="toggleSelectOfferForm()">Хочу</button><br>
+
+        <form action="{% url 'send_offer' item.id %}" method="POST" class="form-group" style="display: none;" id="form_select">
+          {% csrf_token %}
+          <label for="select">Выбери свою вещь на обмен:</label>
+          <select id="select" class="form-control form-control-md" name="items_to_offer">
+            {% for user_item in user.items.all %}
+              <option value="{{ user_item.id }}">{{ user_item.title }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-primary" type="submit">Предложить обмен</button>
+        </form>
+      </div>
+      {% else %}
+        <div class="alert alert-warning">
+          Чтобы предложить обмен, нужно создать пару своих предложений. Похоже ты еще не добавил ни одного на обмен.<br>
+          <a class="btn btn-primary" href="{% url 'new_item' %}">Подать объявление</a>
+        </div>
+      {% endif  %}
+
+    {% elif item in user.items.all %}
+
+      <div class="alert alert-primary">
+        Это обьявление создано вами.
+      </div>
+
+    {% else %}
+      <div class="alert alert-warning">
+        Чтобы предложить обмен, <a href="{% url 'login' %}">авторизируйся</a> или <a href="{% url 'register' %}">зарегистрируйся</a>
+      </div>
+    {% endif %}
+
+  </div>
+  <div>
+    <h2>Фото:</h2>
   </div>
   {% for image in item.images.all %}
-    <img src="{{ image.img.url }}" class="card-img-bottom" alt="{{ item.title }}">
+    <img src="{{ image.img.url }}" class="card-img-bottom" style="width: 60%" alt="{{ item.title }}">
   {% endfor %}
 </div>
+
+
+<script>
+
+function toggleSelectOfferForm(){
+  let select_offer_form = document.querySelector('#form_select')
+  let button = document.querySelector('#button_select')
+
+  console.log(select_offer_form)
+  console.log(button)
+
+  if (select_offer_form.style.display === 'none') {
+    select_offer_form.style.display = 'block';
+    button.style.display = 'none';
+  }
+}
+
+</script>
 
 {% endblock %}

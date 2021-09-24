@@ -17,9 +17,6 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'index' %}"><b>Главная</b></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Категории</a>
-      </li>
     </ul>
 
     <span class="navbar-text">
@@ -30,22 +27,27 @@
                       <a class="btn btn-primary" href="{% url 'new_item' %}">Подать объявление</a>
                     </li>
                     <li class="nav-item">
+                      <a class="nav-link" href="{% url 'offers' %}">Мне предлагают</a>
+                    </li>
+                    <li class="nav-item">
                         <a  class="nav-link" href="{% url 'profile' pk=request.user.id %}">{{ user.username }}</a>
                     </li>
                     <li class="nav-item">
                         <a  class="nav-link" href="{% url 'logout' %}">Выйти</a>
                     </li>
+
                 {% else %}
+
                     <li class="nav-item">
                         <a  class="nav-link" href="{% url 'register' %}">Регистрация</a>
                     </li>
                     <li class="nav-item">
                         <a  class="nav-link" href="{% url 'login' %}">Войти</a>
                     </li>
+
                 {% endif %}
             </ul>
     </span>
-
   </div>
 </nav>
 
