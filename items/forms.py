@@ -29,16 +29,19 @@ class ItemForm(forms.Form):
         empty_label=''
     )
     phonenumber = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
         label='Телефон',
         required=False
     )
     email = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
         label='Почта',
         required=False
     )
     other_contact = forms.CharField(
+        required=False,
         widget=forms.TextInput(attrs={'readonly': 'readonly'}),
         label='Прочий контакт',
         required=False

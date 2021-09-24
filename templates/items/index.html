@@ -50,8 +50,11 @@
           {% if page_obj %}
             {% for item in page_obj %}
 
-              <div class="card" style="width: 60%">
-                <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
+
+              <div class="card" style="width: 100%">
+                {% if item.images.all.0.img.url %}
+                  <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
+                {% endif %}
                 <div class="card-body">
                   <h5 class="card-title">{{ item.title }}</h5>
                   <p class="card-text">{{ item.description|truncatewords:30 }}</p>
