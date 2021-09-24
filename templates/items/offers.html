@@ -12,7 +12,9 @@
     <div class="card" style="width: 40%">
         <div class="card-body">
           <h5 class="card-title"><a href="{% url 'item_detail' item.id %}">{{ item.title }}</a></h5>
+          {% if item.images.all.0.img.url %}
             <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
+          {% endif %}
           <p class="card-text">
               Пользователь <b>{{ item.owner.username }}</b> предлагает обмен.
           </p>

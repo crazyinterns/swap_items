@@ -74,7 +74,7 @@ def send_offer(request, pk):
         wanted_item = get_object_or_404(Item, id=pk)
         item_to_offer_id = request.POST.get('items_to_offer')
         if item_to_offer_id:
-            item_to_offer = get_object_or_404(Item, id=item_to_offer_id[0])
+            item_to_offer = get_object_or_404(Item, id=item_to_offer_id)
             wanted_item.items_to_swap.set([item_to_offer])
             return HttpResponseRedirect(reverse('item_detail', args=[pk]))
     return HttpResponseRedirect(reverse('index'))
