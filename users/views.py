@@ -12,6 +12,8 @@ from django.shortcuts import render, get_object_or_404
 from users.models import CustomUser
 from users.forms import CustomUserChangeForm
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.conf import settings
 
 
 def logout_view(request):
@@ -40,7 +42,12 @@ def register(request):
 @login_required
 def profile(request, pk):
     user = get_object_or_404(CustomUser, id=pk)
-    items = user.items.all
+    items = user.items.all()
+    paginator = Paginator(items, settings.ITEMS_PER_PAGE)
+
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+    is_paginated = page.has_other_pages()
 
     if user != request.user:
         raise Http404
@@ -55,5 +62,9 @@ def profile(request, pk):
     return render(
         request,
         'users/profile.html',
-        {'user_form': form, 'items': items}
+        {
+            'user_form': form,
+            'page_obj': page,
+            'is_paginated': is_paginated
+        }
     )

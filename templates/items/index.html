@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  {% if category_name %}
-    {{ category_name }}
+  {% if category %}
+    {{ category }}
   {% else %}
     Главная страница
   {% endif %}
@@ -19,6 +19,12 @@
               <span>КАТЕГОРИИ</span>
             </h6>
             <ul class="nav flex-column mb-2">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">
+                  <span data-feather="file-text"></span>
+                  Любая категория
+                </a>
+              </li>
               {% for category in categories %}
               <li class="nav-item">
                 <a class="nav-link" href="{{ request.path }}?category={{ category.title }}">
@@ -33,16 +39,16 @@
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            {% if category_name %}
-              <h2 class="h2">Вещи на обмен из категории: <i>{{ category_name }}</i></h2>
+            {% if category %}
+              <h2 class="h2">Вещи на обмен из категории: <i>{{ category }}</i></h2>
             {% else %}
               <h2 class="h2">Все вещи на обмен</h2>
             {% endif %}
 
           </div>
 
-          {% if items %}
-            {% for item in items %}
+          {% if page_obj %}
+            {% for item in page_obj %}
 
               <div class="card" style="width: 100%">
                 <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
@@ -53,12 +59,19 @@
                 </div>
               </div>
 
-            {% endfor items %}
+            {% endfor page_obj %}
           {% else %}
             <h4>Вещей на обмен пока что нет.</h4>
           {% endif %}
 
         </main>
       </div>
+      
+      {% if is_paginated %}
+        <div>
+          {% include 'pagination.html'%}
+        </div>
+      {% endif %}
+      
     </div>
 {% endblock %}
