@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from items.forms import ItemForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
+from django.core.paginator import Paginator
+from django.conf import settings
 
 
 def index(request):
@@ -16,10 +18,21 @@ def index(request):
     if category_name:
         items = items.filter(category__title=category_name)
 
+    paginator = Paginator(items, settings.ITEMS_PER_PAGE)
+
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+    is_paginated = page.has_other_pages()
+
     return render(
         request,
         'items/index.html',
-        {'items': items, 'categories': categories, 'category_name': category_name}
+        {
+            'page_obj': page,
+            'is_paginated': is_paginated,
+            'categories': categories,
+            'category': category_name
+        }
     )
 
 
