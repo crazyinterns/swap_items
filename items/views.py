@@ -10,10 +10,16 @@ from django.shortcuts import reverse
 def index(request):
     items = Item.objects.all()
     categories = Category.objects.all()
+
+    category_name = request.GET.get('category')
+
+    if category_name:
+        items = items.filter(category__title=category_name)
+
     return render(
         request,
         'items/index.html',
-        {'items': items, 'categories': categories}
+        {'items': items, 'categories': categories, 'category_name': category_name}
     )
 
 
