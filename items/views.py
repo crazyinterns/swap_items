@@ -105,7 +105,8 @@ def new_item(request):
                 title=cleaned_data['title'],
                 description=cleaned_data['description'],
                 category=cleaned_data['category'],
-                owner=user
+                owner=user,
+                address=cleaned_data['address']
             )
             item.save()
             images = [Image(img=file, item=item) for file in files]

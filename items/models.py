@@ -35,6 +35,11 @@ class Item(models.Model):
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    address = models.CharField(
+        'адрес',
+        max_length=100,
+        blank=True,
+    )
 
     def __str__(self):
         return self.title
