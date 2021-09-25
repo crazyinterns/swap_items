@@ -10,7 +10,7 @@
   <div class="card-body">
     <h1 class="card-title">{{ item.title }}</h1>
     <p class="card-text"><small class="text-muted">
-      Добавлено: {{item.created_at}} пользователем: {{item.owner.username}}
+      Добавлено: {{item.created_at}} пользователем: <a href="{% url 'profile' item.owner.id %}">{{item.owner.username}}</a>
     </small></p>
     <p class="card-text">
       <small class="text-muted">

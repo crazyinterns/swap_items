@@ -1,0 +1,30 @@
+<div class="col-md-4">
+    <div class="card h-100" style="min-width: 12rem;">
+        {% if item.images.all.0 %}
+        <a href="{% url 'item_detail' item.id %}">
+            <img class="card-img-top" src="{{ item.images.all.0.img.url }}" alt="{{ item.title }}">
+        </a>
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ item.title }}</h5>
+            <p class="card-text text-center">
+                <strong>
+                    <p class="card-text"><small class="text-muted">
+                            Добавлено: {{item.created_at}} пользователем: 
+                            {% if user != item.owner %}
+                                <a href="{% url 'user_items' item.owner.id %}">{{item.owner.username}}</a>
+                            {% else %}
+                                {{item.owner.username}}
+                            {% endif %}
+                        </small></p>
+                    <p class="card-text">
+                        <small class="text-muted">Категория:
+                            <a href="{% url 'index' %}?category={{ item.category.title }}">{{ item.category.title }}</a>
+                        </small>
+                    </p>
+                </strong>
+            </p>
+            <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>
+        </div>
+    </div>
+</div>
