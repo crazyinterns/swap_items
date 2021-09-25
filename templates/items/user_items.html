@@ -5,14 +5,9 @@
 {% block content %}
 
 <div>
-  <form method="post" >
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    <button class="btn btn-primary" type="submit">Сохранить</button>
-  </form>
 
   {% if page_obj %}
-  <p>Мои объявления</p>
+  <p><h4>Объявления пользователя {{ user_details.username }}:</h4></p>
   <div class="row">
     <div class="card-deck">
       {% for item in page_obj %}
@@ -20,12 +15,16 @@
       {% endfor %}
     </div>
   </div>
+  {% else %}
+    <h4>У этого пользователя вещей на обмен пока что нет.</h4>
   {% endif %}
 
-  {% if is_paginated %}
-  <div>
-    {% include 'pagination.html'%}
-  </div>
-  {% endif %}
+  <section>
+    {% if is_paginated %}
+    <div>
+      {% include 'pagination.html'%}
+    </div>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

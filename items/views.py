@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.core.paginator import Paginator
 from django.conf import settings
+from users.models import CustomUser
 
 
 def index(request):
@@ -113,3 +114,24 @@ def new_item(request):
 
             return HttpResponseRedirect(reverse('item_detail', args=[item.id]))
     return render(request, 'items/new_item.html', {'item_form': item_form})
+
+
+def user_items(request, pk):
+    user = get_object_or_404(CustomUser, id=pk)
+    items = Item.objects.filter(owner=user)
+
+    paginator = Paginator(items, settings.ITEMS_PER_PAGE)
+
+    page_number = request.GET.get('page', 1)
+    page = paginator.get_page(page_number)
+    is_paginated = page.has_other_pages()
+
+    return render(
+        request,
+        'items/user_items.html',
+        {
+            'page_obj': page,
+            'is_paginated': is_paginated,
+            'user_details' : user
+        }
+    )

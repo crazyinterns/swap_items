@@ -48,29 +48,14 @@
           </div>
 
           {% if page_obj %}
-            {% for item in page_obj %}
-
-
-              <div class="card" style="width: 100%">
-                {% if item.images.all.0.img.url %}
-                  <img src="{{ item.images.all.0.img.url }}" class="card-img-top" alt="{{ item.title }}">
-                {% endif %}
-                <div class="card-body">
-                  <h5 class="card-title">{{ item.title }}</h5>
-                  <p class="card-text">{{ item.description|truncatewords:30 }}</p>
-                  <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>
-                  <p class="card-text"><small class="text-muted">
-                    Добавлено: {{item.created_at}} пользователем: {{item.owner.username}}
-                  </small></p>
-                  <p class="card-text"><small class="text-muted">
-                    Категория: <a href="{% url 'index' %}?category={{ item.category.title }}">
-                      {{ item.category.title }}
-                    </a>
-                  </small></p>
-                </div>
+            <div class="row">
+              <div class="card-deck">
+                {% for item in page_obj %}
+                  {% include 'items/item_card.html' %}
+                {% endfor %}
               </div>
+            </div>
 
-            {% endfor page_obj %}
           {% else %}
             <h4>Вещей на обмен пока что нет.</h4>
           {% endif %}
