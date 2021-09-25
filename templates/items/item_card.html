@@ -22,6 +22,7 @@
                             <a href="{% url 'index' %}?category={{ item.category.title }}">{{ item.category.title }}</a>
                         </small>
                     </p>
+                    <p class="card-text"><small class="text-muted">Адрес: {{item.address}}</small></p>
                 </strong>
             </p>
             <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>

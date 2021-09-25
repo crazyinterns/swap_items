@@ -18,6 +18,7 @@
       </small>
     </p>
     <p class="card-text">{{ item.description }}</p>
+    <p class="lead">Адрес: {{item.address}}</p>
 
 
 
@@ -61,12 +62,15 @@
     {% endif %}
 
   </div>
-  <div>
-    <h2>Фото:</h2>
-  </div>
-  {% for image in item.images.all %}
-    <img src="{{ image.img.url }}" class="card-img-bottom" style="width: 60%" alt="{{ item.title }}">
-  {% endfor %}
+  {% if item.images.all.0 %}
+    <div>
+      <h2>Фото:</h2>
+    </div>
+    {% for image in item.images.all %}
+      <img src="{{ image.img.url }}" class="card-img-bottom" style="width: 60%" alt="{{ item.title }}">
+    {% endfor %}
+  {% endif %}
+  
 </div>
 
 

@@ -47,6 +47,10 @@ class ItemForm(forms.Form):
         required=False,
         widget=forms.ClearableFileInput(attrs={'multiple': True})
     )
-
+    address = forms.CharField(
+        required=True,
+        label='Адрес',
+        max_length=100,
+    )
 
 
