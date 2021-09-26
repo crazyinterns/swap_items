@@ -145,3 +145,5 @@ ITEMS_PER_PAGE = 10
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'
+
+CAN_DELETE_ON_PAGE = True

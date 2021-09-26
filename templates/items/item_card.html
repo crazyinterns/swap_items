@@ -1,4 +1,4 @@
-<div class="col-md-4">
+<div class="col-md-4 my-2 my-sm-3 my-lg-4 p-3">
     <div class="card h-100" style="min-width: 12rem;">
         {% if item.images.all.0 %}
         <a href="{% url 'item_detail' item.id %}">
@@ -14,7 +14,7 @@
                             {% if user != item.owner %}
                                 <a href="{% url 'user_items' item.owner.id %}">{{item.owner.username}}</a>
                             {% else %}
-                                {{item.owner.username}}
+                                <a href="{% url 'profile' pk=request.user.id %}">{{item.owner.username}}</a>
                             {% endif %}
                         </small></p>
                     <p class="card-text">
@@ -25,7 +25,41 @@
                     <p class="card-text"><small class="text-muted">Адрес: {{item.address}}</small></p>
                 </strong>
             </p>
-            <a href="{% url 'item_detail' item.id %}" class="btn btn-primary">Подробнее</a>
+            <a href="{% url 'item_detail' item.id %}" class="btn btn-secondary">Подробнее</a>
+
+            {% if user == item.owner and can_delete %}
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalCenter{{item.id}}">
+                    Удалить
+                </button>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="ModalCenter{{item.id}}" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle{{item.id}}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLongTitle">Удаление</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <div class="modal-body">
+                            Вы уверены что хотите удалить объявление?
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                            
+                            <form method="POST" action="{% url 'delete_item' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Да</button>
+                            </form>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>

@@ -5,14 +5,28 @@
 {% block content %}
 
 <div>
-  <form method="post" >
+  <form method='POST' enctype="multipart/form-data" class="form">
     {% csrf_token %}
-    {{ user_form.as_p }}
-    <button class="btn btn-primary" type="submit">Сохранить</button>
-  </form>
+    {% for field in user_form %}
+      {% if field.name != 'password' %}
+        <fieldset class="control-group">
+            <label class="control-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                <div class="controls">
+                    {{ field }}
+                    <p class="help-text">{{ field.help_text }} </p>
+            </div>
+        </fieldset>
+      {% endif %}
+    {% endfor %}
+    <button name="submit" class="btn btn-primary" value="submit" id="publish_button">Сохранить</button>
+</form>
 
-  {% if page_obj %}
-  <p>Мои объявления</p>
+
+{% if page_obj %}
+  <div class="text-left my-2 my-sm-3 my-lg-4 p-3">
+    <h4>Мои объявления:</h4>
+  </div>
+
   <div class="row">
     <div class="card-deck">
       {% for item in page_obj %}

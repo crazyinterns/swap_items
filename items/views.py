@@ -1,8 +1,8 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 
 from items.models import Item, Category, Image
 from django.contrib.auth.decorators import login_required
-from items.forms import ItemForm
+from items.forms import ItemForm, ItemChangeForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.core.paginator import Paginator
@@ -41,7 +41,11 @@ def item_detail(request, pk):
     item = get_object_or_404(Item, id=pk)
     user = request.user
 
-    context = {'user': user, 'item': item}
+    context = {
+        'user': user,
+        'item': item,
+        'can_delete': settings.CAN_DELETE_ON_PAGE
+    }
 
     return render(request, 'items/detail.html', context)
 
@@ -117,6 +121,43 @@ def new_item(request):
     return render(request, 'items/new_item.html', {'item_form': item_form})
 
 
+@login_required
+def edit_item(request, pk):
+    item = get_object_or_404(Item, id=pk)
+    if request.method != 'POST':
+        item_form = ItemChangeForm(instance=item)
+    else:
+        item_form = ItemChangeForm(
+            data=request.POST,
+        )
+        files = request.FILES.getlist('images')
+        if item_form.is_valid():
+
+            cleaned_data = item_form.cleaned_data
+
+            item.title = cleaned_data['title']
+            item.description = cleaned_data['description']
+            item.category = cleaned_data['category']
+            item.address = cleaned_data['address']
+
+            if files:
+                images = [Image(img=file, item=item) for file in files]
+                item.images.set(images, bulk=False)
+            item.save()
+
+            return HttpResponseRedirect(reverse('item_detail', args=[item.id]))
+
+    return render(
+        request,
+        'items/edit_item.html',
+        {
+            'item': item,
+            'item_form': item_form,
+            'can_delete': settings.CAN_DELETE_ON_PAGE
+        }
+    )
+
+
 def user_items(request, pk):
     user = get_object_or_404(CustomUser, id=pk)
     items = Item.objects.filter(owner=user)
@@ -133,6 +174,23 @@ def user_items(request, pk):
         {
             'page_obj': page,
             'is_paginated': is_paginated,
-            'user_details' : user
+            'user_details': user
         }
     )
+
+
+@login_required(login_url='/users/login/')
+def delete_item(request, pk):
+    if request.method == 'POST':
+        user = request.user
+        item = get_object_or_404(Item, id=pk)
+        item.delete()
+        return HttpResponseRedirect(reverse('profile', args=[user.id]))
+
+
+@login_required(login_url='/users/login/')
+def delete_image(request, pk):
+    if request.method == 'POST':
+        image = get_object_or_404(Image, id=pk)
+        image.delete()
+        return HttpResponseRedirect(reverse('edit_item', args=[image.item.id]))

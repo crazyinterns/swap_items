@@ -39,7 +39,7 @@ def register(request):
     return render(request, 'registration/register.html', context)
 
 
-@login_required
+@login_required(login_url='/users/login/')
 def profile(request, pk):
     user = get_object_or_404(CustomUser, id=pk)
     items = user.items.all()
@@ -65,6 +65,7 @@ def profile(request, pk):
         {
             'user_form': form,
             'page_obj': page,
-            'is_paginated': is_paginated
+            'is_paginated': is_paginated,
+            'can_delete': settings.CAN_DELETE_ON_PAGE
         }
     )
