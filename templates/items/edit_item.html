@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h2>Редактировать объявление:</h2>
+{% endblock header %}
+
+{% block content %}
+
+
+<form action="{% url 'edit_item' item.id %}" method='POST' enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    {% for field in item_form %}
+        <fieldset class="control-group">
+            <label class="control-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                <div class="controls">
+                    {{ field }}
+                    <p class="help-text">{{ field.help_text }} </p>
+            </div>
+        </fieldset>
+    {% endfor %}
+    <button name="submit" class="btn btn-primary">Сохранить</button>
+</form>
+
+
+
+{% if item.images.all.0 and user == item.owner and can_delete %}
+
+<div class="text-left my-2 my-sm-3 my-lg-4 p-3">
+    <h4>Фотографии объявления:</h4>
+</div>
+
+<div class="row">
+    <div class="card-deck">
+        {% for image in item.images.all %}
+            <div class="col-md-4">
+                <div class="card ml-3 mr-3 my-2 my-sm-3 my-lg-4 p-3" style="min-width: 12rem;">
+
+                    <img src="{{ image.img.url }}" class="rounded mx-auto d-block card-img-top" style="width: 60%"
+                        alt="{{ item.title }}">
+
+                    <div class="card-body d-flex justify-content-center">
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-danger btn-block mt-auto" data-toggle="modal"
+                            data-target="#ModalCenter{{forloop.counter}}">Удалить</button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="ModalCenter{{forloop.counter}}" tabindex="{{forloop.counter}}" role="dialog"
+                            aria-labelledby="ModalCenterTitle{{image.id}}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLongTitle{{forloop.counter}}">Удаление</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Вы уверены что хотите удалить картинку?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+
+                                        <form method="POST" action="{% url 'delete_image' image.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Да</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

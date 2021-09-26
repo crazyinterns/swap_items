@@ -6,10 +6,19 @@
 
 {% block content %}
 
+
 <form action="{% url 'new_item' %}" method='POST' enctype="multipart/form-data" class="form">
     {% csrf_token %}
-    {{ item_form.as_p }}
-    {{ image_form.as_p }}
-    <button name="submit" class="btn btn-primary">Разместить</button>
+    {% for field in item_form %}
+        <fieldset class="control-group">
+            <label class="control-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                <div class="controls">
+                    {{ field }}
+                    <p class="help-text">{{ field.help_text }} </p>
+            </div>
+        </fieldset>
+    {% endfor %}
+    <button name="submit" class="btn btn-primary" value="submit" id="publish_button">Разместить</button>
 </form>
+
 {% endblock %}

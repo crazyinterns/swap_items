@@ -4,75 +4,118 @@
 
 {% block content %}
 
+<div class="d-flex justify-content-center">
+  <div class="card col-md-8">
+    <div class="card-body">
+      <h1 class="card-title">{{ item.title }}</h1>
+      <p class="card-text"><small class="text-muted">
+        Добавлено: {{item.created_at}} пользователем:
+          {% if user != item.owner %}
+            <a href="{% url 'user_items' item.owner.id %}">{{item.owner.username}}</a>
+          {% else %}
+            <a href="{% url 'profile' pk=request.user.id %}">{{item.owner.username}}</a>
+          {% endif %}
+      </small></p>
+      <p class="card-text">
+        <small class="text-muted">
+          Категория: <a href="{% url 'index' %}?category={{ item.category.title }}">{{ item.category.title }}</a>
+        </small>
+      </p>
+      <p class="card-text">{{ item.description }}</p>
+      <p class="lead">Адрес: {{item.address}}</p>
 
-<div class="card mb-3">
-
-  <div class="card-body">
-    <h1 class="card-title">{{ item.title }}</h1>
-    <p class="card-text"><small class="text-muted">
-      Добавлено: {{item.created_at}} пользователем: <a href="{% url 'profile' item.owner.id %}">{{item.owner.username}}</a>
-    </small></p>
-    <p class="card-text">
-      <small class="text-muted">
-        Категория: <a href="{% url 'index' %}?category={{ item.category.title }}">{{ item.category.title }}</a>
-      </small>
-    </p>
-    <p class="card-text">{{ item.description }}</p>
-    <p class="lead">Адрес: {{item.address}}</p>
 
 
+    </div>
+    <div>
 
-  </div>
-  <div>
+      {% if user.is_authenticated and item not in user.items.all %}
 
-    {% if user.is_authenticated and item not in user.items.all %}
+        {% if user.items.all %}
+        <div class="alert alert-primary">
+          <button id="button_select" class="btn btn-primary" type="button" onclick="toggleSelectOfferForm()">Хочу</button><br>
 
-      {% if user.items.all %}
-      <div class="alert alert-primary">
-        <button id="button_select" class="btn btn-primary" type="button" onclick="toggleSelectOfferForm()">Хочу</button><br>
+          <form action="{% url 'send_offer' item.id %}" method="POST" class="form-group" style="display: none;" id="form_select">
+            {% csrf_token %}
+            <label for="select">Выбери свою вещь на обмен:</label>
+            <select id="select" class="form-control form-control-md" name="items_to_offer">
+              {% for user_item in user.items.all %}
+                <option value="{{ user_item.id }}">{{ user_item.title }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Предложить обмен</button>
+          </form>
+        </div>
+        {% else %}
+          <div class="alert alert-warning">
+            Чтобы предложить обмен, нужно создать пару своих предложений. Похоже ты еще не добавил ни одного на обмен.<br>
+            <a class="btn btn-primary" href="{% url 'new_item' %}">Подать объявление</a>
+          </div>
+        {% endif  %}
 
-        <form action="{% url 'send_offer' item.id %}" method="POST" class="form-group" style="display: none;" id="form_select">
-          {% csrf_token %}
-          <label for="select">Выбери свою вещь на обмен:</label>
-          <select id="select" class="form-control form-control-md" name="items_to_offer">
-            {% for user_item in user.items.all %}
-              <option value="{{ user_item.id }}">{{ user_item.title }}</option>
-            {% endfor %}
-          </select>
-          <button class="btn btn-primary" type="submit">Предложить обмен</button>
-        </form>
-      </div>
+      {% elif item in user.items.all %}
+
+        <div class="alert alert-primary">
+          Это обьявление создано вами.
+        </div>
+
       {% else %}
         <div class="alert alert-warning">
-          Чтобы предложить обмен, нужно создать пару своих предложений. Похоже ты еще не добавил ни одного на обмен.<br>
-          <a class="btn btn-primary" href="{% url 'new_item' %}">Подать объявление</a>
+          Чтобы предложить обмен, <a href="{% url 'login' %}">авторизируйся</a> или <a href="{% url 'register' %}">зарегистрируйся</a>
         </div>
-      {% endif  %}
+      {% endif %}
 
-    {% elif item in user.items.all %}
-
-      <div class="alert alert-primary">
-        Это обьявление создано вами.
+    </div>
+    {% if item.images.all.0 %}
+      <div class="text-center">
+        <h2>Фотографии:</h2>
       </div>
+      {% for image in item.images.all %}
+        <img src="{{ image.img.url }}" class="rounded mx-auto d-block card-img-top my-2 my-sm-3 my-lg-4 p-3" style="width: 60%" alt="{{ item.title }}">
+      {% endfor %}
+    {% endif %}
+    
 
-    {% else %}
-      <div class="alert alert-warning">
-        Чтобы предложить обмен, <a href="{% url 'login' %}">авторизируйся</a> или <a href="{% url 'register' %}">зарегистрируйся</a>
+    {% if user == item.owner and can_delete %}
+      <div class="row d-flex justify-content-center mx-auto my-2 my-sm-3 my-lg-4 p-3">
+        <a href="{% url 'edit_item' item.id %}" class="btn btn-primary mr-3">Редактировать</a>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-danger ml-3" data-toggle="modal" data-target="#ModalCenter">
+            Удалить
+        </button>
+      </div>
+      <!-- Modal -->
+      <div class="modal fade" id="ModalCenter" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                  <h5 class="modal-title" id="ModalLongTitle">Удаление</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+                  </div>
+                  <div class="modal-body">
+                  Вы уверены что хотите удалить объявление?
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Нет</button>
+                  
+                  <form method="POST" action="{% url 'delete_item' item.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger">Да</button>
+                  <form>
+                  
+                  </div>
+              </div>
+          </div>
       </div>
     {% endif %}
 
-  </div>
-  {% if item.images.all.0 %}
-    <div>
-      <h2>Фото:</h2>
-    </div>
-    {% for image in item.images.all %}
-      <img src="{{ image.img.url }}" class="card-img-bottom" style="width: 60%" alt="{{ item.title }}">
-    {% endfor %}
-  {% endif %}
-  
-</div>
 
+
+  </div>
+
+</div>
 
 <script>
 

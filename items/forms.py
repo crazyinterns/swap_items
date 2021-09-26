@@ -1,5 +1,5 @@
 from django import forms
-from items.models import Category
+from items.models import Category, Item
 
 
 class ItemForm(forms.Form):
@@ -45,7 +45,8 @@ class ItemForm(forms.Form):
     )
     images = forms.ImageField(
         required=False,
-        widget=forms.ClearableFileInput(attrs={'multiple': True})
+        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        label='Картинки'
     )
     address = forms.CharField(
         required=True,
@@ -54,3 +55,24 @@ class ItemForm(forms.Form):
     )
 
 
+class ItemChangeForm(forms.ModelForm):
+
+    class Meta:
+        model = Item
+        fields = (
+            'title',
+            'description',
+            'category',
+            'address',
+        )
+        labels = {
+            'title': 'Название',
+            'description': 'Описание',
+            'category': 'Категория',
+            'address': 'Адрес',
+        }
+    images = forms.ImageField(
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        label='Добавить картинки'
+    )
