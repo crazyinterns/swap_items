@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from items.models import Category, Item, Image
+from items.models import Category, Item, Image, Offer
 
 
 @admin.register(Category)
@@ -25,9 +25,6 @@ class ImageInline(admin.TabularInline):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    raw_id_fields = [
-        'items_to_swap'
-    ]
     search_fields = ['title']
     list_display = [
         'title',
@@ -36,4 +33,8 @@ class ItemAdmin(admin.ModelAdmin):
     ]
     inlines = [ImageInline]
 
+
+@admin.register(Offer)
+class OfferAdmin(admin.ModelAdmin):
+    pass
 

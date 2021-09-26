@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404
-
-from items.models import Item, Category, Image
 from django.contrib.auth.decorators import login_required
-from items.forms import ItemForm, ItemChangeForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.db.models import Q
+
 from users.models import CustomUser
+from items.models import Item, Category, Image, Offer
+from items.forms import ItemForm, ItemChangeForm
 
 
 def index(request):
@@ -40,11 +41,13 @@ def index(request):
 def item_detail(request, pk):
     item = get_object_or_404(Item, id=pk)
     user = request.user
+    offered_items = item.item_to_swap_offers.filter(item_to_swap__owner=user).order_by('-created_at')
 
     context = {
         'user': user,
         'item': item,
-        'can_delete': settings.CAN_DELETE_ON_PAGE
+        'can_delete': settings.CAN_DELETE_ON_PAGE,
+        'offered_items': offered_items
     }
 
     return render(request, 'items/detail.html', context)
@@ -52,13 +55,29 @@ def item_detail(request, pk):
 
 @login_required
 def offers(request):
-    items = request.user.items.filter(items_to_swap__isnull=False)
-    items_to_swap = set()
+    user = request.user
 
-    for item in items:
-        items_to_swap.update(item.items_to_swap.all())
+    sorting = request.GET.get('sorting')
 
-    paginator = Paginator(items, settings.ITEMS_PER_PAGE)
+    if sorting == 'asc':
+        sort_by = 'created_at'
+    else:
+        sort_by = '-created_at'
+
+    if request.GET.get('type') == 'wishlist':
+        offers = Offer.objects.filter(item_to_swap__owner=user, is_accepted=False).order_by(sort_by)
+        title = 'Мой список желаний'
+    elif request.GET.get('type') == 'matched':
+        offers = Offer.objects.filter(
+            Q(item_to_swap__owner=user, is_accepted=True) |
+            Q(wanted_item__owner=user, is_accepted=True)
+        ).order_by(sort_by)
+        title = 'Принятые предложения'
+    else:
+        offers = Offer.objects.filter(wanted_item__owner=user, is_accepted=False).order_by(sort_by)
+        title = 'Мне предлагают'
+
+    paginator = Paginator(offers, settings.ITEMS_PER_PAGE)
 
     page_number = request.GET.get('page', 1)
     page = paginator.get_page(page_number)
@@ -67,7 +86,8 @@ def offers(request):
     context = {
         'page_obj': page,
         'is_paginated': is_paginated,
-        'items_to_swap': items_to_swap
+        'offers': offers,
+        'title': title
     }
 
     return render(request, 'items/offers.html', context)
@@ -80,8 +100,19 @@ def send_offer(request, pk):
         item_to_offer_id = request.POST.get('items_to_offer')
         if item_to_offer_id:
             item_to_offer = get_object_or_404(Item, id=item_to_offer_id)
-            wanted_item.items_to_swap.set([item_to_offer])
-            return HttpResponseRedirect(reverse('item_detail', args=[pk]))
+
+            offers = Offer.objects.filter(item_to_swap=wanted_item, wanted_item=item_to_offer)
+
+            if offers:
+                offer = offers[0]
+                offer.is_accepted = True
+                offer.save()
+            else:
+                Offer.objects.create(
+                    wanted_item=wanted_item,
+                    item_to_swap=item_to_offer
+                )
+            return HttpResponseRedirect(reverse('wishlist'))
     return HttpResponseRedirect(reverse('index'))
 
 

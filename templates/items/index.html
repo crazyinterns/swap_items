@@ -29,7 +29,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{ request.path }}?category={{ category.title }}">
                   <span data-feather="file-text"></span>
-                  {{ category.title }}
+                  {{ category.title }} <small><i>({{ category.items.all|length }})</i></small>
                 </a>
               </li>
               {% endfor %}
