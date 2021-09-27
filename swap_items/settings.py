@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'phonenumber_field',
-    'items'
+    'items',
+    'coordinates'
 ]
 
 MIDDLEWARE = [
@@ -147,3 +148,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'
 
 CAN_DELETE_ON_PAGE = True
+
+YA_API_KEY = env('YA_API_KEY')
