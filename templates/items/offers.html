@@ -19,12 +19,19 @@
             <img class="card-img-top" src="{{ offer.item_to_swap.images.all.0.img.url }}" alt="{{ item.title }}">
             {% endif %}
           <p class="card-text">
-              Предложение: <a href="{% url 'item_detail' offer.item_to_swap.id %}">{{ offer.item_to_swap.title }}</a>
+              <a href="{% url 'item_detail' offer.item_to_swap.id %}">{{ offer.item_to_swap.title }} от {{ offer.item_to_swap.owner.username}}</a>
               обменять на <a href="{% url 'item_detail' offer.wanted_item.id %}">{{ offer.wanted_item.title}}</a>
           </p>
           <p class="card-text"><small class="text-muted">
             Дата предложения: {{ offer.created_at }}
           </small></p>
+
+            <form action="{% url 'send_offer' offer.wanted_item.id %}" method="POST" class="form-group" id="form_select">
+                {% csrf_token %}
+                <input type="text" name="items_to_offer" value="{{ offer.item_to_swap.id }}" readonly hidden />
+                <button class="btn btn-primary" type="submit">Принять обмен</button>
+            </form>
+
         </div>
       </div>
     {% endfor %}

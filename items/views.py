@@ -57,24 +57,17 @@ def item_detail(request, pk):
 def offers(request):
     user = request.user
 
-    sorting = request.GET.get('sorting')
-
-    if sorting == 'asc':
-        sort_by = 'created_at'
-    else:
-        sort_by = '-created_at'
-
     if request.GET.get('type') == 'wishlist':
-        offers = Offer.objects.filter(item_to_swap__owner=user, is_accepted=False).order_by(sort_by)
+        offers = Offer.objects.filter(item_to_swap__owner=user, is_accepted=False).order_by('-created_at')
         title = 'Мой список желаний'
     elif request.GET.get('type') == 'matched':
         offers = Offer.objects.filter(
             Q(item_to_swap__owner=user, is_accepted=True) |
             Q(wanted_item__owner=user, is_accepted=True)
-        ).order_by(sort_by)
+        ).order_by('-created_at')
         title = 'Принятые предложения'
     else:
-        offers = Offer.objects.filter(wanted_item__owner=user, is_accepted=False).order_by(sort_by)
+        offers = Offer.objects.filter(wanted_item__owner=user, is_accepted=False).order_by('-created_at')
         title = 'Мне предлагают'
 
     paginator = Paginator(offers, settings.ITEMS_PER_PAGE)
@@ -98,13 +91,14 @@ def send_offer(request, pk):
     if request.method == 'POST':
         wanted_item = get_object_or_404(Item, id=pk)
         item_to_offer_id = request.POST.get('items_to_offer')
+
         if item_to_offer_id:
             item_to_offer = get_object_or_404(Item, id=item_to_offer_id)
 
             offers = Offer.objects.filter(item_to_swap=wanted_item, wanted_item=item_to_offer)
 
             if offers:
-                offer = offers[0]
+                offer = offers.first()
                 offer.is_accepted = True
                 offer.save()
             else:
@@ -112,7 +106,7 @@ def send_offer(request, pk):
                     wanted_item=wanted_item,
                     item_to_swap=item_to_offer
                 )
-            return HttpResponseRedirect(reverse('wishlist'))
+            return HttpResponseRedirect(reverse('offers'))
     return HttpResponseRedirect(reverse('index'))
 
 
