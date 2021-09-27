@@ -12,26 +12,38 @@
     {% for offer in offers %}
     <div class="card" style="width: 40%">
         <div class="card-body">
-          <h5 class="card-title">Пользователь <b>{{ offer.item_to_swap.owner.username }}</b>
-              предложил обмен пользователю <b> {{ offer.wanted_item.owner.username }}</b>.
-          </h5>
+            {% if offer.item_to_swap.owner == user %}
+                <h5 class="card-title"><b><a href="{% url 'user_items' user.id %}">Вы</a></b>
+                  предложили обмен пользователю <b><a href="{% url 'user_items' offer.wanted_item.owner.id %}">{{ offer.wanted_item.owner.username }}</a></b>.
+                </h5>
+            {% else %}
+            <h5 class="card-title"><b><a href="{% url 'user_items' offer.wanted_item.owner.id %}">{{ offer.item_to_swap.owner.username|title }}</a></b>
+                предложил обмен <b><a href="{% url 'user_items' user.id %}">Вам</a></b>.
+                </h5>
+            {% endif %}
+
             {% if offer.item_to_swap.images.all.0.img %}
-            <img class="card-img-top" src="{{ offer.item_to_swap.images.all.0.img.url }}" alt="{{ item.title }}">
+                <img class="card-img-top" src="{{ offer.item_to_swap.images.all.0.img.url }}" alt="{{ item.title }}">
             {% endif %}
           <p class="card-text">
-              <a href="{% url 'item_detail' offer.item_to_swap.id %}">{{ offer.item_to_swap.title }} от {{ offer.item_to_swap.owner.username}}</a>
-              обменять на <a href="{% url 'item_detail' offer.wanted_item.id %}">{{ offer.wanted_item.title}}</a>
+              <a href="{% url 'item_detail' offer.item_to_swap.id %}">
+                  {{ offer.item_to_swap.title }}
+              </a> ({{ offer.item_to_swap.owner.username}}) обменять на
+              <a href="{% url 'item_detail' offer.wanted_item.id %}">
+                  {{ offer.wanted_item.title}}
+              </a> ({{ offer.wanted_item.owner.username}}
           </p>
           <p class="card-text"><small class="text-muted">
             Дата предложения: {{ offer.created_at }}
           </small></p>
 
+            {% if not request.GET.type %}
             <form action="{% url 'send_offer' offer.wanted_item.id %}" method="POST" class="form-group" id="form_select">
                 {% csrf_token %}
                 <input type="text" name="items_to_offer" value="{{ offer.item_to_swap.id }}" readonly hidden />
                 <button class="btn btn-primary" type="submit">Принять обмен</button>
             </form>
-
+            {% endif %}
         </div>
       </div>
     {% endfor %}

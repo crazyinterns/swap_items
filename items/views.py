@@ -41,14 +41,16 @@ def index(request):
 def item_detail(request, pk):
     item = get_object_or_404(Item, id=pk)
     user = request.user
-    offered_items = item.item_to_swap_offers.filter(item_to_swap__owner=user).order_by('-created_at')
 
     context = {
         'user': user,
         'item': item,
         'can_delete': settings.CAN_DELETE_ON_PAGE,
-        'offered_items': offered_items
     }
+
+    if user.is_authenticated:
+        offered_items = item.item_to_swap_offers.filter(item_to_swap__owner=user).order_by('-created_at')
+        context['offered_items'] = offered_items
 
     return render(request, 'items/detail.html', context)
 
@@ -95,7 +97,10 @@ def send_offer(request, pk):
         if item_to_offer_id:
             item_to_offer = get_object_or_404(Item, id=item_to_offer_id)
 
-            offers = Offer.objects.filter(item_to_swap=wanted_item, wanted_item=item_to_offer)
+            offers = Offer.objects.filter(
+                Q(item_to_swap=wanted_item, wanted_item=item_to_offer) |
+                Q(wanted_item=wanted_item, item_to_swap=item_to_offer)
+            )
 
             if offers:
                 offer = offers.first()
