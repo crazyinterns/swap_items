@@ -2,6 +2,14 @@ from django.db import models
 
 from users.models import CustomUser
 
+from items.geo_utils import fetch_coordinates, parse_coordinates, \
+    fetch_metro, fetch_district
+
+import json
+import requests
+from coordinates.models import Coordinates
+from django.conf import settings
+
 
 class Category(models.Model):
     title = models.CharField(verbose_name='Категория', max_length=50)
@@ -42,6 +50,60 @@ class Item(models.Model):
         verbose_name = 'предмет на обмен'
         verbose_name_plural = 'предметы на обмен'
         ordering = ['-created_at', 'title']
+
+    def get_item_geo_params(self):
+
+        item_geo_obj = Coordinates.objects.filter(
+            address=self.address
+        )
+
+        if item_geo_obj.exists():
+            coordinates = item_geo_obj[0].coordinates
+            metro = item_geo_obj[0].metro
+            district = item_geo_obj[0].district
+            item_long, item_lat = parse_coordinates(coordinates)
+
+        else:
+            try:
+                item_long, item_lat = fetch_coordinates(
+                    settings.YA_API_KEY,
+                    self.address
+                )
+                if item_long:
+                    metro = fetch_metro(
+                        settings.YA_API_KEY,
+                        item_long, item_lat
+                    )
+
+                    district = fetch_district(
+                        settings.YA_API_KEY,
+                        item_long, item_lat
+                    )
+                else:
+                    metro = None
+                    district = None
+
+                Coordinates.objects.create(
+                    address=self.address,
+                    coordinates=json.dumps(
+                        {'long': item_long, 'lat': item_lat}
+                    ),
+                    metro=metro or None,
+                    district=district or None
+                )
+            except requests.exceptions.ReadTimeout:
+                return
+            except requests.exceptions.ConnectionError:
+                return
+            except requests.exceptions.HTTPError:
+                return
+
+        return {
+            'item_long': item_long,
+            'item_lat': item_lat,
+            'metro': metro,
+            'district': district
+        }
 
 
 class Offer(models.Model):

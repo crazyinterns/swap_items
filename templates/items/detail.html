@@ -23,9 +23,16 @@
       </p>
       <p class="card-text">{{ item.description }}</p>
       <p class="lead">Адрес: {{item.address}}</p>
-
-
-
+      
+      {% if not item.get_item_geo_params.item_long %}
+        <p class="card-text"><small class="text-muted">Нет возможности уточнить адрес</small></p>
+      {% endif %}
+      {% if item.get_item_geo_params.metro %}
+            <p class="card-text"><small class="text-muted">{{ item.get_item_geo_params.metro }}</small></p>
+      {% endif %}
+      {% if item.get_item_geo_params.district and not item.get_item_geo_params.metro %}
+            <p class="card-text"><small class="text-muted">{{ item.get_item_geo_params.district }}</small></p>
+      {% endif %}
     </div>
     <div>
 
@@ -110,8 +117,6 @@
           </div>
       </div>
     {% endif %}
-
-
 
   </div>
 
