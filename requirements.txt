@@ -5,4 +5,4 @@ pytz==2021.1
 sqlparse==0.4.2
 environs==9.3.3
 django-phonenumber-field==5.2.0
-phonenumbers==8.12.31
+phonenumbers==8.12.31requests==2.26.0
